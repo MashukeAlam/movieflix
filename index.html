@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieFlix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-gray-100 dark:bg-gray-800 p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold">MovieFlix</a>
+            <div class="flex items-center space-x-4">
+                <a href="#home" class="hover:text-blue-400 page-link">Home</a>
+                <div class="relative group">
+                    <button class="hover:text-blue-400">Categories</button>
+                    <div class="absolute hidden group-hover:block bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2">
+                        <a href="#category/action" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Action</a>
+                        <a href="#category/comedy" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Comedy</a>
+                        <a href="#category/drama" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Drama</a>
+                        <a href="#category/scifi" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Sci-Fi</a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search movies..." class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <div id="searchResults" class="absolute hidden bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2 w-64 max-h-64 overflow-y-auto"></div>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <svg id="theme-icon-light" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="content" class="container mx-auto p-4">
+        <!-- Home Page -->
+        <div id="home-page" class="page">
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Trending Movies</h2>
+                <div id="trending-movies" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Recent Action Movies</h2>
+                <div id="recent-action" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Recent Comedy Movies</h2>
+                <div id="recent-comedy" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Recent Drama Movies</h2>
+                <div id="recent-drama" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Recent Sci-Fi Movies</h2>
+                <div id="recent-scifi" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+        </div>
+
+        <!-- Category Page -->
+        <div id="category-page" class="page hidden">
+            <h2 id="category-title" class="text-2xl font-bold mb-4"></h2>
+            <div id="category-movies" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Movie Details Page -->
+        <div id="movie-details-page" class="page hidden">
+            <div id="movie-details" class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Movie Data
+        const movies = [
+            { id: 1, title: "Action Hero", category: "Action", year: 2023, rating: 7.8, description: "An explosive action-packed adventure.", image: "https://placehold.co/200x300/ef4444/white?text=Action+Hero", trending: true },
+            { id: 2, title: "Laugh Out Loud", category: "Comedy", year: 2024, rating: 6.5, description: "A hilarious comedy for all ages.", image: "https://placehold.co/200x300/f59e0b/white?text=Laugh+Out+Loud", trending: true },
+            { id: 3, title: "Deep Emotions", category: "Drama", year: 2023, rating: 8.2, description: "A touching story of love and loss.", image: "https://placehold.co/200x300/3b82f6/white?text=Deep+Emotions" },
+            { id: 4, title: "Space Odyssey", category: "Sci-Fi", year: 2024, rating: 7.9, description: "A journey through the stars.", image: "https://placehold.co/200x300/8b5cf6/white?text=Space+Odyssey", trending: true },
+            { id: 5, title: "Fast Chase", category: "Action", year: 2024, rating: 7.0, description: "High-speed action thriller.", image: "https://placehold.co/200x300/ef4444/white?text=Fast+Chase" },
+            { id: 6, title: "Funny Times", category: "Comedy", year: 2023, rating: 6.8, description: "Non-stop laughs with friends.", image: "https://placehold.co/200x300/f59e0b/white?text=Funny+Times" },
+            { id: 7, title: "Life's Journey", category: "Drama", year: 2024, rating: 8.0, description: "A story of personal growth.", image: "https://placehold.co/200x300/3b82f6/white?text=Life's+Journey" },
+            { id: 8, title: "Alien Worlds", category: "Sci-Fi", year: 2023, rating: 7.5, description: "Exploring unknown planets.", image: "https://placehold.co/200x300/8b5cf6/white?text=Alien+Worlds" },
+            { id: 9, title: "Steel Fortress", category: "Action", year: 2022, rating: 7.2, description: "A lone soldier defends a critical outpost.", image: "https://placehold.co/200x300/ef4444/white?text=Steel+Fortress" },
+            { id: 10, title: "Cosmic Joke", category: "Comedy", year: 2022, rating: 6.2, description: "A stand-up special that's out of this world.", image: "https://placehold.co/200x300/f59e0b/white?text=Cosmic+Joke" },
+            { id: 11, title: "The Last Stand", category: "Drama", year: 2022, rating: 8.5, description: "A community fights to save their town.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Last+Stand" },
+            { id: 12, title: "Galaxy Quest 2", category: "Sci-Fi", year: 2022, rating: 7.1, description: "The crew is back for another adventure.", image: "https://placehold.co/200x300/8b5cf6/white?text=Galaxy+Quest+2" },
+            { id: 13, title: "River of Bullets", category: "Action", year: 2021, rating: 6.9, description: "A thrilling chase down a dangerous river.", image: "https://placehold.co/200x300/ef4444/white?text=River+of+Bullets" },
+            { id: 14, title: "Silly Symphony", category: "Comedy", year: 2021, rating: 6.0, description: "An orchestra of mishaps and mayhem.", image: "https://placehold.co/200x300/f59e0b/white?text=Silly+Symphony" },
+            { id: 15, title: "The Weight of a Crown", category: "Drama", year: 2021, rating: 8.8, description: "The heavy burden of a young queen.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Weight+of+a+Crown" },
+            { id: 16, title: "Martian Chronicles", category: "Sci-Fi", year: 2021, rating: 7.6, description: "The first human colony on Mars.", image: "https://placehold.co/200x300/8b5cf6/white?text=Martian+Chronicles" },
+            { id: 17, title: "Jungle Heat", category: "Action", year: 2020, rating: 6.5, description: "Lost in the jungle, hunted by mercenaries.", image: "https://placehold.co/200x300/ef4444/white?text=Jungle+Heat" },
+            { id: 18, title: "The Prankster", category: "Comedy", year: 2020, rating: 5.8, description: "A high school prank goes horribly right.", image: "https://placehold.co/200x300/f59e0b/white?text=The+Prankster" },
+            { id: 19, title: "Echoes of the Past", category: "Drama", year: 2020, rating: 8.1, description: "A man confronts his childhood trauma.", image: "https://placehold.co/200x300/3b82f6/white?text=Echoes+of+the+Past" },
+            { id: 20, title: "Time Jumpers", category: "Sci-Fi", year: 2020, rating: 7.3, description: "They can travel through time, but can they fix it?", image: "https://placehold.co/200x300/8b5cf6/white?text=Time+Jumpers" },
+            { id: 21, title: "Desert Fury", category: "Action", year: 2019, rating: 6.7, description: "A high-octane race across the desert.", image: "https://placehold.co/200x300/ef4444/white?text=Desert+Fury" },
+            { id: 22, title: "Clown College", category: "Comedy", year: 2019, rating: 5.5, description: "Learning to be funny is serious business.", image: "https://placehold.co/200x300/f59e0b/white?text=Clown+College" },
+            { id: 23, title: "The Lighthouse Keeper", category: "Drama", year: 2019, rating: 7.9, description: "A story of isolation and madness.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Lighthouse+Keeper" },
+            { id: 24, title: "Cybernetic Revolt", category: "Sci-Fi", year: 2019, rating: 7.0, description: "The machines are rising up.", image: "https://placehold.co/200x300/8b5cf6/white?text=Cybernetic+Revolt" },
+            { id: 25, title: "Avalanche", category: "Action", year: 2018, rating: 6.3, description: "Trapped in a ski resort during a massive avalanche.", image: "https://placehold.co/200x300/ef4444/white?text=Avalanche" },
+            { id: 26, title: "Weekend at Bernie's 3", category: "Comedy", year: 2018, rating: 4.2, description: "He's back, and he's still dead.", image: "https://placehold.co/200x300/f59e0b/white?text=Weekend+at+Bernie's+3" },
+            { id: 27, title: "The Pianist's Hands", category: "Drama", year: 2018, rating: 8.4, description: "A story of music, love, and war.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Pianist's+Hands" },
+            { id: 28, title: "Starship Troopers: Reboot", category: "Sci-Fi", year: 2018, rating: 6.8, description: "Would you like to know more?", image: "https://placehold.co/200x300/8b5cf6/white?text=Starship+Troopers" },
+            { id: 29, title: "Skyscraper Inferno", category: "Action", year: 2017, rating: 6.1, description: "Trapped at the top of a burning building.", image: "https://placehold.co/200x300/ef4444/white?text=Skyscraper+Inferno" },
+            { id: 30, title: "Dad Jokes: The Movie", category: "Comedy", year: 2017, rating: 5.1, description: "He's got a million of 'em.", image: "https://placehold.co/200x300/f59e0b/white?text=Dad+Jokes" },
+            { id: 31, title: "The Long Road Home", category: "Drama", year: 2017, rating: 8.0, description: "A soldier's journey back to his family.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Long+Road+Home" },
+            { id: 32, title: "Planet of the Apes: The Musical", category: "Sci-Fi", year: 2017, rating: 5.5, description: "They finally made a monkey out of him.", image: "https://placehold.co/200x300/8b5cf6/white?text=Planet+of+the+Apes" },
+            { id: 33, title: "Hard Target 2", category: "Action", year: 2016, rating: 5.9, description: "The hunt is on, again.", image: "https://placehold.co/200x300/ef4444/white?text=Hard+Target+2" },
+            { id: 34, title: "Whoopee Cushion", category: "Comedy", year: 2016, rating: 4.8, description: "The hilarious history of a classic prank.", image: "https://placehold.co/200x300/f59e0b/white?text=Whoopee+Cushion" },
+            { id: 35, title: "The Artist's Muse", category: "Drama", year: 2016, rating: 7.7, description: "A painter finds his inspiration in a mysterious woman.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Artist's+Muse" },
+            { id: 36, title: "Attack of the 50-Foot Woman's Daughter", category: "Sci-Fi", year: 2016, rating: 4.5, description: "Like mother, like daughter.", image: "https://placehold.co/200x300/8b5cf6/white?text=Attack+of+the+50-Foot+Woman's+Daughter" },
+            { id: 37, title: "Maximum Overdrive 2", category: "Action", year: 2015, rating: 5.2, description: "The machines are still angry.", image: "https://placehold.co/200x300/ef4444/white?text=Maximum+Overdrive+2" },
+            { id: 38, title: "The Wrong Box", category: "Comedy", year: 2015, rating: 6.3, description: "A series of unfortunate events and a misplaced coffin.", image: "https://placehold.co/200x300/f59e0b/white?text=The+Wrong+Box" },
+            { id: 39, title: "The Glass Menagerie", category: "Drama", year: 2015, rating: 7.5, description: "A classic play brought to the big screen.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Glass+Menagerie" },
+            { id: 40, title: "The Blob's Revenge", category: "Sci-Fi", year: 2015, rating: 5.1, description: "It's back, and it's bigger than ever.", image: "https://placehold.co/200x300/8b5cf6/white?text=The+Blob's+Revenge" },
+            { id: 41, title: "Universal Soldier: The Reckoning", category: "Action", year: 2012, rating: 6.9, description: "The ultimate soldier is back.", image: "https://placehold.co/200x300/ef4444/white?text=Universal+Soldier" },
+            { id: 42, title: "A Haunted House", category: "Comedy", year: 2013, rating: 5.0, description: "A parody of the found footage genre.", image: "https://placehold.co/200x300/f59e0b/white?text=A+Haunted+House" },
+            { id: 43, title: "The Great Gatsby", category: "Drama", year: 2013, rating: 7.2, description: "A lavish adaptation of the classic novel.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Great+Gatsby" },
+            { id: 44, title: "Pacific Rim", category: "Sci-Fi", year: 2013, rating: 6.9, description: "Giant robots fighting giant monsters.", image: "https://placehold.co/200x300/8b5cf6/white?text=Pacific+Rim" },
+            { id: 45, title: "The Expendables 2", category: "Action", year: 2012, rating: 6.6, description: "They're back, and they've got more friends.", image: "https://placehold.co/200x300/ef4444/white?text=The+Expendables+2" },
+            { id: 46, title: "21 Jump Street", category: "Comedy", year: 2012, rating: 7.2, description: "They're not teenagers anymore, but they're going back to high school.", image: "https://placehold.co/200x300/f59e0b/white?text=21+Jump+Street" },
+            { id: 47, title: "Lincoln", category: "Drama", year: 2012, rating: 7.3, description: "A powerful look at the 16th president of the United States.", image: "https://placehold.co/200x300/3b82f6/white?text=Lincoln" },
+            { id: 48, title: "The Avengers", category: "Sci-Fi", year: 2012, rating: 8.0, description: "Earth's mightiest heroes assemble.", image: "https://placehold.co/200x300/8b5cf6/white?text=The+Avengers" },
+            { id: 49, title: "Fast Five", category: "Action", year: 2011, rating: 7.3, description: "The Fast and the Furious crew is back for another heist.", image: "https://placehold.co/200x300/ef4444/white?text=Fast+Five" },
+            { id: 50, title: "Bridesmaids", category: "Comedy", year: 2011, rating: 6.8, description: "A hilarious look at the world of weddings.", image: "https://placehold.co/200x300/f59e0b/white?text=Bridesmaids" },
+            { id: 51, title: "The Help", category: "Drama", year: 2011, rating: 8.1, description: "A powerful story about the lives of African-American maids in the 1960s.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Help" },
+            { id: 52, title: "Super 8", category: "Sci-Fi", year: 2011, rating: 7.0, description: "A group of kids witness a mysterious train crash.", image: "https://placehold.co/200x300/8b5cf6/white?text=Super+8" },
+            { id: 53, title: "Inception", category: "Action", year: 2010, rating: 8.8, description: "A thief who steals information by entering people's dreams.", image: "https://placehold.co/200x300/ef4444/white?text=Inception" },
+            { id: 54, title: "The Other Guys", category: "Comedy", year: 2010, rating: 6.6, description: "Two mismatched cops get their chance to shine.", image: "https://placehold.co/200x300/f59e0b/white?text=The+Other+Guys" },
+            { id: 55, title: "The King's Speech", category: "Drama", year: 2010, rating: 8.0, description: "The story of King George VI and his speech therapist.", image: "https://placehold.co/200x300/3b82f6/white?text=The+King's+Speech" },
+            { id: 56, title: "Tron: Legacy", category: "Sci-Fi", year: 2010, rating: 6.8, description: "A son searches for his long-lost father in a digital world.", image: "https://placehold.co/200x300/8b5cf6/white?text=Tron:+Legacy" },
+            { id: 57, title: "The Hurt Locker", category: "Action", year: 2008, rating: 7.5, description: "An intense look at an Army bomb squad in Iraq.", image: "https://placehold.co/200x300/ef4444/white?text=The+Hurt+Locker" },
+            { id: 58, title: "Tropic Thunder", category: "Comedy", year: 2008, rating: 7.0, description: "A group of actors making a war movie get caught up in a real war.", image: "https://placehold.co/200x300/f59e0b/white?text=Tropic+Thunder" },
+            { id: 59, title: "Slumdog Millionaire", category: "Drama", year: 2008, rating: 8.0, description: "A young man from the slums of Mumbai wins a game show.", image: "https://placehold.co/200x300/3b82f6/white?text=Slumdog+Millionaire" },
+            { id: 60, title: "Iron Man", category: "Sci-Fi", year: 2008, rating: 7.9, description: "A billionaire industrialist builds a powered suit of armor.", image: "https://placehold.co/200x300/8b5cf6/white?text=Iron+Man" },
+            { id: 61, title: "300", category: "Action", year: 2006, rating: 7.6, description: "A stylized retelling of the Battle of Thermopylae.", image: "https://placehold.co/200x300/ef4444/white?text=300" },
+            { id: 62, title: "Borat", category: "Comedy", year: 2006, rating: 7.3, description: "A Kazakh journalist travels to America.", image: "https://placehold.co/200x300/f59e0b/white?text=Borat" },
+            { id: 63, title: "The Departed", category: "Drama", year: 2006, rating: 8.5, description: "An undercover cop and a mole in the police try to identify each other.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Departed" },
+            { id: 64, title: "Children of Men", category: "Sci-Fi", year: 2006, rating: 7.9, description: "In a world where women can no longer have children, a miracle occurs.", image: "https://placehold.co/200x300/8b5cf6/white?text=Children+of+Men" },
+            { id: 65, title: "Casino Royale", category: "Action", year: 2006, rating: 8.0, description: "James Bond's first mission as a 00 agent.", image: "https://placehold.co/200x300/ef4444/white?text=Casino+Royale" },
+            { id: 66, title: "Little Miss Sunshine", category: "Comedy", year: 2006, rating: 7.8, description: "A dysfunctional family takes a cross-country trip in their VW bus.", image: "https://placehold.co/200x300/f59e0b/white?text=Little+Miss+Sunshine" },
+            { id: 67, title: "The Prestige", category: "Drama", year: 2006, rating: 8.5, description: "Two rival magicians engage in a bitter and deadly rivalry.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Prestige" },
+            { id: 68, title: "V for Vendetta", category: "Sci-Fi", year: 2005, rating: 8.2, description: "A masked freedom fighter tries to overthrow a totalitarian government.", image: "https://placehold.co/200x300/8b5cf6/white?text=V+for+Vendetta" },
+            { id: 69, title: "Batman Begins", category: "Action", year: 2005, rating: 8.2, description: "The origin story of the Dark Knight.", image: "https://placehold.co/200x300/ef4444/white?text=Batman+Begins" },
+            { id: 70, title: "The 40-Year-Old Virgin", category: "Comedy", year: 2005, rating: 7.1, description: "A man's friends try to help him lose his virginity.", image: "https://placehold.co/200x300/f59e0b/white?text=The+40-Year-Old+Virgin" },
+            { id: 71, title: "Brokeback Mountain", category: "Drama", year: 2005, rating: 7.7, description: "The story of a forbidden and secret relationship between two cowboys.", image: "https://placehold.co/200x300/3b82f6/white?text=Brokeback+Mountain" },
+            { id: 72, title: "Serenity", category: "Sci-Fi", year: 2005, rating: 7.8, description: "The crew of the Serenity try to evade an assassin.", image: "https://placehold.co/200x300/8b5cf6/white?text=Serenity" },
+            { id: 73, title: "Kill Bill: Vol. 2", category: "Action", year: 2004, rating: 8.0, description: "The Bride continues her quest for revenge.", image: "https://placehold.co/200x300/ef4444/white?text=Kill+Bill:+Vol.+2" },
+            { id: 74, title: "Anchorman: The Legend of Ron Burgundy", category: "Comedy", year: 2004, rating: 7.2, description: "A 1970s news anchor's world is turned upside down.", image: "https://placehold.co/200x300/f59e0b/white?text=Anchorman" },
+            { id: 75, title: "Million Dollar Baby", category: "Drama", year: 2004, rating: 8.1, description: "A determined woman works with a hardened boxing trainer.", image: "https://placehold.co/200x300/3b82f6/white?text=Million+Dollar+Baby" },
+            { id: 76, title: "Eternal Sunshine of the Spotless Mind", category: "Sci-Fi", year: 2004, rating: 8.3, description: "A couple undergoes a procedure to erase each other from their memories.", image: "https://placehold.co/200x300/8b5cf6/white?text=Eternal+Sunshine" },
+            { id: 77, title: "The Lord of the Rings: The Return of the King", category: "Action", year: 2003, rating: 8.9, description: "The final confrontation between the forces of good and evil.", image: "https://placehold.co/200x300/ef4444/white?text=Return+of+the+King" },
+            { id: 78, title: "Old School", category: "Comedy", year: 2003, rating: 7.1, description: "Three friends start a fraternity.", image: "https://placehold.co/200x300/f59e0b/white?text=Old+School" },
+            { id: 79, title: "Lost in Translation", category: "Drama", year: 2003, rating: 7.7, description: "A faded movie star and a neglected young woman form an unlikely bond.", image: "https://placehold.co/200x300/3b82f6/white?text=Lost+in+Translation" },
+            { id: 80, title: "The Matrix Reloaded", category: "Sci-Fi", year: 2003, rating: 7.2, description: "Neo and the rebel leaders estimate that they have 72 hours until Zion falls.", image: "https://placehold.co/200x300/8b5cf6/white?text=The+Matrix+Reloaded" },
+            { id: 81, title: "The Lord of the Rings: The Two Towers", category: "Action", year: 2002, rating: 8.7, description: "Frodo and Sam continue their journey to Mordor.", image: "https://placehold.co/200x300/ef4444/white?text=The+Two+Towers" },
+            { id: 82, title: "Super Troopers", category: "Comedy", year: 2001, rating: 7.1, description: "Five Vermont state troopers, avid pranksters with a knack for screwing up.", image: "https://placehold.co/200x300/f59e0b/white?text=Super+Troopers" },
+            { id: 83, title: "A Beautiful Mind", category: "Drama", year: 2001, rating: 8.2, description: "The life of John Nash, a brilliant but asocial mathematician.", image: "https://placehold.co/200x300/3b82f6/white?text=A+Beautiful+Mind" },
+            { id: 84, title: "A.I. Artificial Intelligence", category: "Sci-Fi", year: 2001, rating: 7.2, description: "A highly advanced robotic boy longs to become 'real'.", image: "https://placehold.co/200x300/8b5cf6/white?text=A.I." },
+            { id: 85, title: "Gladiator", category: "Action", year: 2000, rating: 8.5, description: "A former Roman General sets out to exact vengeance against the corrupt emperor.", image: "https://placehold.co/200x300/ef4444/white?text=Gladiator" },
+            { id: 86, title: "Meet the Parents", category: "Comedy", year: 2000, rating: 7.0, description: "A man's first meeting with his girlfriend's parents goes horribly wrong.", image: "https://placehold.co/200x300/f59e0b/white?text=Meet+the+Parents" },
+            { id: 87, title: "Erin Brockovich", category: "Drama", year: 2000, rating: 7.3, description: "An unemployed single mother becomes a legal assistant and almost single-handedly brings down a power company.", image: "https://placehold.co/200x300/3b82f6/white?text=Erin+Brockovich" },
+            { id: 88, title: "X-Men", category: "Sci-Fi", year: 2000, rating: 7.4, description: "Two groups of mutants clash, while the world fears them.", image: "https://placehold.co/200x300/8b5cf6/white?text=X-Men" },
+            { id: 89, title: "The Matrix", category: "Action", year: 1999, rating: 8.7, description: "A computer hacker learns from mysterious rebels about the true nature of his reality.", image: "https://placehold.co/200x300/ef4444/white?text=The+Matrix" },
+            { id: 90, title: "Office Space", category: "Comedy", year: 1999, rating: 7.7, description: "Three company workers who hate their jobs decide to rebel against their greedy boss.", image: "https://placehold.co/200x300/f59e0b/white?text=Office+Space" },
+            { id: 91, title: "The Green Mile", category: "Drama", year: 1999, rating: 8.6, description: "The lives of guards on Death Row are affected by one of their charges.", image: "https://placehold.co/200x300/3b82f6/white?text=The+Green+Mile" },
+            { id: 92, title: "Star Wars: Episode I - The Phantom Menace", category: "Sci-Fi", year: 1999, rating: 6.5, description: "Two Jedi escape a hostile blockade to find allies and come across a young boy who may bring balance to the Force.", image: "https://placehold.co/200x300/8b5cf6/white?text=The+Phantom+Menace" },
+            { id: 93, title: "Saving Private Ryan", category: "Action", year: 1998, rating: 8.6, description: "A group of U.S. soldiers go behind enemy lines to retrieve a paratrooper whose brothers have been killed in action.", image: "https://placehold.co/200x300/ef4444/white?text=Saving+Private+Ryan" },
+            { id: 94, title: "The Big Lebowski", category: "Comedy", year: 1998, rating: 8.1, description: "'The Dude' Lebowski, mistaken for a millionaire Lebowski, seeks restitution for his ruined rug.", image: "https://placehold.co/200x300/f59e0b/white?text=The+Big+Lebowski" },
+            { id: 95, title: "American History X", category: "Drama", year: 1998, rating: 8.5, description: "A former neo-nazi skinhead tries to prevent his younger brother from going down the same wrong path that he did.", image: "https://placehold.co/200x300/3b82f6/white?text=American+History+X" },
+            { id: 96, title: "Dark City", category: "Sci-Fi", year: 1998, rating: 7.6, description: "A man struggles with memories of his past, including a wife he cannot remember, in a dark city with no sun.", image: "https://placehold.co/200x300/8b5cf6/white?text=Dark+City" },
+            { id: 97, title: "Titanic", category: "Drama", year: 1997, rating: 7.8, description: "A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.", image: "https://placehold.co/200x300/3b82f6/white?text=Titanic" },
+            { id: 98, title: "Men in Black", category: "Sci-Fi", year: 1997, rating: 7.3, description: "A police officer joins a secret organization that polices and monitors extraterrestrial interactions on Earth.", image: "https://placehold.co/200x300/8b5cf6/white?text=Men+in+Black" },
+            { id: 99, title: "Face/Off", category: "Action", year: 1997, rating: 7.3, description: "An FBI agent undergoes a face-transplant surgery to assume the identity of a ruthless terrorist.", image: "https://placehold.co/200x300/ef4444/white?text=Face/Off" },
+            { id: 100, title: "Liar Liar", category: "Comedy", year: 1997, rating: 6.9, description: "A fast-track lawyer can't lie for 24 hours due to his son's birthday wish.", image: "https://placehold.co/200x300/f59e0b/white?text=Liar+Liar" },
+            { id: 101, title: "Good Will Hunting", category: "Drama", year: 1997, rating: 8.3, description: "Will Hunting, a janitor at M.I.T., has a gift for mathematics, but needs help from a psychologist to find direction in his life.", image: "https://placehold.co/200x300/3b82f6/white?text=Good+Will+Hunting" },
+            { id: 102, title: "The Fifth Element", category: "Sci-Fi", year: 1997, rating: 7.7, description: "In the colorful future, a cab driver unwittingly becomes the central figure in the search for a legendary cosmic weapon.", image: "https://placehold.co/200x300/8b5cf6/white?text=The+Fifth+Element" }
+        ];
+
+        // Helper Functions
+        function createMovieCard(movie) {
+            return `
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer movie-card" data-id="${movie.id}">
+                    <img src="${movie.image}" alt="${movie.title}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold">${movie.title}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${movie.category} • ${movie.year}</p>
+                        <p class="text-sm">Rating: ${movie.rating}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // Populate Home Page
+        function loadHomePage() {
+            showPage('home-page');
+            const trendingMovies = movies.filter(movie => movie.trending);
+            document.getElementById('trending-movies').innerHTML = trendingMovies.map(createMovieCard).join('');
+            
+            ['action', 'comedy', 'drama', 'scifi'].forEach(category => {
+                const recentMovies = movies.filter(movie => movie.category.toLowerCase() === category).slice(0, 4);
+                document.getElementById(`recent-${category}`).innerHTML = recentMovies.map(createMovieCard).join('');
+            });
+        }
+
+        // Populate Category Page
+        function loadCategoryPage(category) {
+            showPage('category-page');
+            document.getElementById('category-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Movies`;
+            const categoryMovies = movies.filter(movie => movie.category.toLowerCase() === category);
+            document.getElementById('category-movies').innerHTML = categoryMovies.map(createMovieCard).join('');
+        }
+
+        // Populate Movie Details Page
+        function loadMovieDetails(movieId) {
+            showPage('movie-details-page');
+            const movie = movies.find(m => m.id === parseInt(movieId));
+            document.getElementById('movie-details').innerHTML = `
+                <div class="flex flex-col md:flex-row gap-6">
+                    <img src="${movie.image}" alt="${movie.title}" class="w-full md:w-1/3 h-96 object-cover rounded-lg">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-4">${movie.title}</h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-2">${movie.category} • ${movie.year}</p>
+                        <p class="text-lg mb-4">Rating: ${movie.rating}</p>
+                        <p class="text-gray-800 dark:text-gray-300">${movie.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Search Functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
+                searchResults.innerHTML = '';
+                if (query.length > 0) {
+                    const results = movies.filter(movie => movie.title.toLowerCase().includes(query));
+                    searchResults.classList.remove('hidden');
+                    if (results.length > 0) {
+                        searchResults.innerHTML = results.map(movie => `
+                            <div class="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer movie-card" data-id="${movie.id}">
+                                ${movie.title} (${movie.year})
+                            </div>
+                        `).join('');
+                    } else {
+                        searchResults.innerHTML = '<div class="px-4 py-2 text-gray-500 dark:text-gray-400">No results found</div>';
+                    }
+                } else {
+                    searchResults.classList.add('hidden');
+                }
+            });
+
+            searchResults.addEventListener('click', (e) => {
+                const movieCard = e.target.closest('.movie-card');
+                if (movieCard) {
+                    const movieId = movieCard.dataset.id;
+                    window.location.hash = `#movie/${movieId}`;
+                    searchResults.classList.add('hidden');
+                    searchInput.value = '';
+                }
+            });
+        }
+
+        // Routing
+        function handleRouting() {
+            const hash = window.location.hash || '#home';
+            if (hash === '#home') {
+                loadHomePage();
+            } else if (hash.startsWith('#category/')) {
+                const category = hash.split('/')[1];
+                loadCategoryPage(category);
+            } else if (hash.startsWith('#movie/')) {
+                const movieId = hash.split('/')[1];
+                loadMovieDetails(movieId);
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('click', (e) => {
+            const movieCard = e.target.closest('.movie-card');
+            if (movieCard) {
+                const movieId = movieCard.dataset.id;
+                window.location.hash = `#movie/${movieId}`;
+            }
+
+            const pageLink = e.target.closest('.page-link');
+            if (pageLink) {
+                window.location.hash = pageLink.getAttribute('href');
+            }
+        });
+
+        window.addEventListener('hashchange', handleRouting);
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSearch();
+            handleRouting();
+        });
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+
+        // Check for saved theme in local storage
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIconLight.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIconDark.classList.remove('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            // toggle theme
+            document.documentElement.classList.toggle('dark');
+
+            // update local storage
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIconDark.classList.remove('hidden');
+                themeIconLight.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

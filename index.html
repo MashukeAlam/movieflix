@@ -43,12 +43,29 @@
     <header>
         <nav class="bg-gray-100 dark:bg-gray-800 p-4 sticky top-0 z-10">
             <div class="container mx-auto flex justify-between items-center">
-                <a href="#home" class="text-2xl font-bold">MovieFlix</a>
-                <div class="flex items-center space-x-4">
+                <a href="#home" class="text-2xl font-bold page-link">MovieFlix</a>
+                
+                <div class="flex items-center space-x-2">
+                    <!-- Theme Toggle for all sizes -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <svg id="theme-icon-light" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+
+                    <!-- Hamburger Menu Button -->
+                    <div class="md:hidden">
+                        <button id="menu-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4" id="desktop-menu">
                     <a href="#home" class="hover:text-blue-400 page-link">Home</a>
                     <div class="relative group">
                         <button class="hover:text-blue-400">Categories</button>
-                        <div class="absolute hidden group-hover:block bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2">
+                        <div class="absolute hidden group-hover:block bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2 z-20">
                             <a href="#category/action" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Action</a>
                             <a href="#category/comedy" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Comedy</a>
                             <a href="#category/drama" class="block px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 page-link">Drama</a>
@@ -57,12 +74,25 @@
                     </div>
                     <div class="relative">
                         <input type="text" id="searchInput" placeholder="Search movies..." class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <div id="searchResults" class="absolute hidden bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2 w-64 max-h-64 overflow-y-auto"></div>
+                        <div id="searchResults" class="absolute hidden bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2 w-64 max-h-64 overflow-y-auto z-20"></div>
                     </div>
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                        <svg id="theme-icon-light" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4">
+                <div class="relative p-4">
+                    <input type="text" id="mobileSearchInput" placeholder="Search movies..." class="w-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <div id="mobileSearchResults" class="absolute hidden bg-gray-200 dark:bg-gray-700 rounded shadow-lg mt-2 w-full max-h-64 overflow-y-auto z-20"></div>
+                </div>
+                <a href="#home" class="block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 page-link">Home</a>
+                <div class="relative">
+                    <button class="w-full text-left block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700" id="mobile-categories-toggle">Categories</button>
+                    <div id="mobile-categories" class="hidden pl-4">
+                        <a href="#category/action" class="block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 page-link">Action</a>
+                        <a href="#category/comedy" class="block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 page-link">Comedy</a>
+                        <a href="#category/drama" class="block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 page-link">Drama</a>
+                        <a href="#category/scifi" class="block py-2 px-4 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 page-link">Sci-Fi</a>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -264,7 +294,7 @@
             const movie = movies.find(m => m.id === parseInt(movieId));
             document.getElementById('movie-details').innerHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
-                    <img src="${movie.image}" alt="${movie.title}" class="w-full md:w-1/3 h-96 object-cover rounded-lg">
+                    <img src="${movie.image}" alt="${movie.title}" class="w-full md:w-1/3 h-auto md:h-96 object-cover rounded-lg">
                     <div>
                         <h1 class="text-3xl font-bold mb-4">${movie.title}</h1>
                         <p class="text-gray-600 dark:text-gray-400 mb-2">${movie.category} • ${movie.year}</p>
@@ -277,37 +307,44 @@
 
         // Search Functionality
         function setupSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const searchResults = document.getElementById('searchResults');
-            
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                searchResults.innerHTML = '';
-                if (query.length > 0) {
-                    const results = movies.filter(movie => movie.title.toLowerCase().includes(query));
-                    searchResults.classList.remove('hidden');
-                    if (results.length > 0) {
-                        searchResults.innerHTML = results.map(movie => `
-                            <div class="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer movie-card" data-id="${movie.id}">
-                                ${movie.title} (${movie.year})
-                            </div>
-                        `).join('');
-                    } else {
-                        searchResults.innerHTML = '<div class="px-4 py-2 text-gray-500 dark:text-gray-400">No results found</div>';
-                    }
-                } else {
-                    searchResults.classList.add('hidden');
-                }
-            });
+            const searchInputs = [
+                { input: document.getElementById('searchInput'), results: document.getElementById('searchResults'), menu: null },
+                { input: document.getElementById('mobileSearchInput'), results: document.getElementById('mobileSearchResults'), menu: document.getElementById('mobile-menu') }
+            ];
 
-            searchResults.addEventListener('click', (e) => {
-                const movieCard = e.target.closest('.movie-card');
-                if (movieCard) {
-                    const movieId = movieCard.dataset.id;
-                    window.location.hash = `#movie/${movieId}`;
-                    searchResults.classList.add('hidden');
-                    searchInput.value = '';
-                }
+            searchInputs.forEach(({ input, results, menu }) => {
+                input.addEventListener('input', () => {
+                    const query = input.value.toLowerCase();
+                    results.innerHTML = '';
+                    if (query.length > 0) {
+                        const searchResults = movies.filter(movie => movie.title.toLowerCase().includes(query));
+                        results.classList.remove('hidden');
+                        if (searchResults.length > 0) {
+                            results.innerHTML = searchResults.map(movie => `
+                                <div class="px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-pointer movie-card" data-id="${movie.id}">
+                                    ${movie.title} (${movie.year})
+                                </div>
+                            `).join('');
+                        } else {
+                            results.innerHTML = '<div class="px-4 py-2 text-gray-500 dark:text-gray-400">No results found</div>';
+                        }
+                    } else {
+                        results.classList.add('hidden');
+                    }
+                });
+
+                results.addEventListener('click', (e) => {
+                    const movieCard = e.target.closest('.movie-card');
+                    if (movieCard) {
+                        const movieId = movieCard.dataset.id;
+                        window.location.hash = `#movie/${movieId}`;
+                        results.classList.add('hidden');
+                        input.value = '';
+                        if (menu && !menu.classList.contains('hidden')) {
+                            menu.classList.add('hidden');
+                        }
+                    }
+                });
             });
         }
 
@@ -326,52 +363,66 @@
         }
 
         // Event Listeners
-        document.addEventListener('click', (e) => {
-            const movieCard = e.target.closest('.movie-card');
-            if (movieCard) {
-                const movieId = movieCard.dataset.id;
-                window.location.hash = `#movie/${movieId}`;
-            }
-
-            const pageLink = e.target.closest('.page-link');
-            if (pageLink) {
-                window.location.hash = pageLink.getAttribute('href');
-            }
-        });
-
-        window.addEventListener('hashchange', handleRouting);
         document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileCategoriesToggle = document.getElementById('mobile-categories-toggle');
+            const mobileCategories = document.getElementById('mobile-categories');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIconLight = document.getElementById('theme-icon-light');
+            const themeIconDark = document.getElementById('theme-icon-dark');
+
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileCategoriesToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileCategories.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                const movieCard = e.target.closest('.movie-card');
+                if (movieCard && !e.target.closest('#searchResults') && !e.target.closest('#mobileSearchResults')) {
+                    const movieId = movieCard.dataset.id;
+                    window.location.hash = `#movie/${movieId}`;
+                }
+
+                const pageLink = e.target.closest('.page-link');
+                if (pageLink) {
+                    window.location.hash = pageLink.getAttribute('href');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+
+            window.addEventListener('hashchange', handleRouting);
+            
             setupSearch();
             handleRouting();
-        });
 
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIconLight = document.getElementById('theme-icon-light');
-        const themeIconDark = document.getElementById('theme-icon-dark');
-
-        // Check for saved theme in local storage
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            themeIconLight.classList.remove('hidden');
-        } else {
-            document.documentElement.classList.remove('dark');
-            themeIconDark.classList.remove('hidden');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            // toggle theme
-            document.documentElement.classList.toggle('dark');
-
-            // update local storage
-            if (document.documentElement.classList.contains('dark')) {
-                localStorage.setItem('theme', 'dark');
+            // Theme Toggler
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
                 themeIconLight.classList.remove('hidden');
-                themeIconDark.classList.add('hidden');
             } else {
-                localStorage.setItem('theme', 'light');
+                document.documentElement.classList.remove('dark');
                 themeIconDark.classList.remove('hidden');
-                themeIconLight.classList.add('hidden');
             }
+
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeIconLight.classList.remove('hidden');
+                    themeIconDark.classList.add('hidden');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeIconDark.classList.remove('hidden');
+                    themeIconLight.classList.add('hidden');
+                }
+            });
         });
     </script>
 </body>
